@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private const double acute_angle_multiplier = 1.95;
         private const double slider_multiplier = 1.35;
         private const double velocity_change_multiplier = 0.75;
-        private const double flow_aim_multiplier = 1;
+        private const double flow_aim_multiplier = 1; // placeholder
 
         /// <summary>
         /// Evaluates the difficulty of aiming the current object, based on:
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (SpeedEvaluator.DistanceBonusSpeed(osuCurrObj, osuLastObj) < 1)
             {
                 double flow_aim = SpeedEvaluator.DistanceBonusSpeed(osuCurrObj, osuLastObj);
-                aimStrain -= flow_aim * flow_aim_multiplier;
+                aimStrain *= flow_aim * flow_aim_multiplier;
             }
 
             // Add in acute angle bonus or wide angle bonus + velocity change bonus, whichever is larger.
