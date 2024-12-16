@@ -47,14 +47,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             if (DifficultyCalculationUtils.MillisecondsToBPM(strainTime) > min_speed_bonus)
                 speedBonus = 0.75 * Math.Pow((DifficultyCalculationUtils.BPMToMilliseconds(min_speed_bonus) - strainTime) / speed_balancing_factor, 2);
 
-            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
-            double distance = travelDistance + osuCurrObj.MinimumJumpDistance;
-
-            // Cap distance at single_spacing_threshold
-            distance = Math.Min(distance, single_spacing_threshold);
-
-            // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
-            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95) * distance_multiplier;
+            double distanceBonus = DistanceBonusSpeed(osuCurrObj, osuPrevObj) * distance_multiplier;
 
             // Base difficulty with all bonuses
             double difficulty = (1 + speedBonus + distanceBonus) * 1000 / strainTime;
@@ -62,5 +55,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Apply penalty if there's doubletappable doubles
             return difficulty * doubletapness;
         }
+        public static double DistanceBonusSpeed(OsuDifficultyHitObject current, OsuDifficultyHitObject? previous)
+        {
+            double travelDistance = previous?.TravelDistance ?? 0;
+            double distance = travelDistance + current.MinimumJumpDistance;
+            // Cap distance at single_spacing_threshold
+            distance = Math.Min(distance, single_spacing_threshold);
+            // Max distance bonus is 1 * `distance_multiplier` at single_spacing_threshold
+            double distanceBonus = Math.Pow(distance / single_spacing_threshold, 3.95);
+            return distanceBonus;
+        }
     }
 }
+
+
