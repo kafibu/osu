@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
-        
+
         [JsonProperty("total_strain_count")]
         public double TotalStrainCount { get; set; }
 
