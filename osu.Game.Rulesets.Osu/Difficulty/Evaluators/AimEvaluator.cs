@@ -61,23 +61,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     // Rewarding angles, take the smaller velocity as base.
                     double angleBonus = Math.Min(currVelocity, prevVelocity);
 
-                    wideAngleBonus = calcWideAngleBonus(currAngle);
-                    acuteAngleBonus = calcAcuteAngleBonus(currAngle);
+                    wideAngleBonus = CalcWideAngleBonus(currAngle);
+                    acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
 
                     if (DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.StrainTime, 2) < 300) // Only buff deltaTime exceeding 300 bpm 1/2.
                         acuteAngleBonus = 0;
                     else
                     {
-                        acuteAngleBonus *= calcAcuteAngleBonus(lastAngle) // Multiply by previous angle, we don't want to buff unless this is a wiggle type pattern.
+                        acuteAngleBonus *= CalcAcuteAngleBonus(lastAngle) // Multiply by previous angle, we don't want to buff unless this is a wiggle type pattern.
                                            * Math.Min(angleBonus, diameter * 1.25 / osuCurrObj.StrainTime) // The maximum velocity we buff is equal to 125 / strainTime
                                            * Math.Pow(Math.Sin(Math.PI / 2 * Math.Min(1, (100 - osuCurrObj.StrainTime) / 25)), 2) // scale buff from 150 bpm 1/4 to 200 bpm 1/4
                                            * Math.Pow(Math.Sin(Math.PI / 2 * (Math.Clamp(osuCurrObj.LazyJumpDistance, radius, diameter) - radius) / radius), 2); // Buff distance exceeding radius up to diameter.
                     }
 
                     // Penalize wide angles if they're repeated, reducing the penalty as the lastAngle gets more acute.
-                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(calcWideAngleBonus(lastAngle), 3)));
+                    wideAngleBonus *= angleBonus * (1 - Math.Min(wideAngleBonus, Math.Pow(CalcWideAngleBonus(lastAngle), 3)));
                     // Penalize acute angles if they're repeated, reducing the penalty as the lastLastAngle gets more obtuse.
-                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(calcAcuteAngleBonus(lastLastAngle), 3)));
+                    acuteAngleBonus *= 0.5 + 0.5 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastLastAngle), 3)));
                 }
             }
 
@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return velocity;
         }
 
-        public static double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
+        public static double CalcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
 
-        public static double calcAcuteAngleBonus(double angle) => 1 - calcWideAngleBonus(angle);
+        public static double CalcAcuteAngleBonus(double angle) => 1 - CalcWideAngleBonus(angle);
     }
 }
