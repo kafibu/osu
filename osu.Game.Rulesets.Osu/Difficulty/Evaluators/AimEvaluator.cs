@@ -128,16 +128,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             return aimStrain;
         }
 
-        public static double VelocityEvaluator(OsuDifficultyHitObject Curr, OsuDifficultyHitObject Prev, bool withSliderTravelDistance)
+        public static double VelocityEvaluator(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, bool withSliderTravelDistance)
         {
-            double velocity = Curr.LazyJumpDistance / Curr.StrainTime;
-            if (Prev.BaseObject is Slider && withSliderTravelDistance)
+            double velocity = curr.LazyJumpDistance / curr.StrainTime;
+
+            if (prev.BaseObject is Slider && withSliderTravelDistance)
             {
-                double travelVelocity = Prev.TravelDistance / Prev.TravelTime;
-                double movementVelocity = Curr.MinimumJumpDistance / Curr.MinimumJumpTime;
+                double travelVelocity = prev.TravelDistance / prev.TravelTime;
+                double movementVelocity = curr.MinimumJumpDistance / curr.MinimumJumpTime;
 
                 velocity = Math.Max(velocity, movementVelocity + travelVelocity);
             }
+
             return velocity;
         }
 
