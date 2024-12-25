@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_OK_HIT_WINDOW = 27;
         protected const int ATTRIB_ID_MONO_STAMINA_FACTOR = 29;
         protected const int ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT = 31;
-        protected const int ATTRIB_ID_TOTAL_STRAIN_COUNT = 31;
+        protected const int ATTRIB_ID_TOTAL_STRAIN_COUNT = 33;
 
         /// <summary>
         /// The mods which were applied to the beatmap.
