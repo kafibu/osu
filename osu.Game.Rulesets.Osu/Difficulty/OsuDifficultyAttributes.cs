@@ -63,36 +63,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double TotalStrainCount { get; set; }
 
         /// <summary>
-        /// The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("approach_rate")]
-        public double ApproachRate { get; set; }
-
-        /// <summary>
-        /// The perceived overall difficulty inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("overall_difficulty")]
-        public double OverallDifficulty { get; set; }
-
-        /// <summary>
-        /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("great_hit_window")]
-        public double GreatHitWindow { get; set; }
-
-        /// <summary>
-        /// The perceived hit window for an OK hit inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("ok_hit_window")]
-        public double OkHitWindow { get; set; }
-
-        /// <summary>
-        /// The perceived hit window for a MEH hit inclusive of rate-adjusting mods (DT/HT/etc).
-        /// </summary>
-        [JsonProperty("meh_hit_window")]
-        public double MehHitWindow { get; set; }
-
-        /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
         /// </summary>
         public double DrainRate { get; set; }
@@ -130,9 +100,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT, SpeedDifficultStrainCount);
             yield return (ATTRIB_ID_SPEED_NOTE_COUNT, SpeedNoteCount);
             yield return (ATTRIB_ID_AIM_DIFFICULT_SLIDER_COUNT, AimDifficultSliderCount);
-
-            yield return (ATTRIB_ID_OK_HIT_WINDOW, OkHitWindow);
-            yield return (ATTRIB_ID_MEH_HIT_WINDOW, MehHitWindow);
             yield return (ATTRIB_ID_TOTAL_STRAIN_COUNT, TotalStrainCount);
         }
 
