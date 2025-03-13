@@ -91,20 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             if (Math.Max(prevVelocity, currVelocity) != 0)
             {
-                // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
-                prevVelocity = (osuLastObj.LazyJumpDistance + osuLastLastObj.TravelDistance) / osuLastObj.StrainTime;
-                currVelocity = (osuCurrObj.LazyJumpDistance + osuLastObj.TravelDistance) / osuCurrObj.StrainTime;
-
-                // Scale with ratio of difference compared to 0.5 * max dist.
-                double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
-
-                // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
-                double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime), Math.Abs(prevVelocity - currVelocity));
-
-                velocityChangeBonus = overlapVelocityBuff * distRatio;
-
-                // Penalize for rhythm changes.
-                velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.StrainTime, osuLastObj.StrainTime) / Math.Max(osuCurrObj.StrainTime, osuLastObj.StrainTime), 2);
+                velocityChangeBonus = VelocityChangeBonus(osuCurrObj, osuLastObj, osuLastLastObj);
             }
 
             if (osuLastObj.BaseObject is Slider)
@@ -138,6 +125,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return velocity;
+        }
+
+        public static double VelocityChangeBonus(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, OsuDifficultyHitObject prevprev)
+        {
+            const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
+            double velocityChangeBonus;
+
+            // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
+            double prevVelocity = (prev.LazyJumpDistance + prevprev.TravelDistance) / prev.StrainTime;
+            double currVelocity = (curr.LazyJumpDistance + prev.TravelDistance) / curr.StrainTime;
+
+            // Scale with ratio of difference compared to 0.5 * max dist.
+            double distRatio = Math.Pow(Math.Sin(Math.PI / 2 * Math.Abs(prevVelocity - currVelocity) / Math.Max(prevVelocity, currVelocity)), 2);
+
+            // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
+            double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(curr.StrainTime, prev.StrainTime), Math.Abs(prevVelocity - currVelocity));
+
+            velocityChangeBonus = overlapVelocityBuff * distRatio;
+
+            // Penalize for rhythm changes.
+            velocityChangeBonus *= Math.Pow(Math.Min(curr.StrainTime, prev.StrainTime) / Math.Max(curr.StrainTime, prev.StrainTime), 2);
+            return velocityChangeBonus;
         }
 
         public static double CalcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
