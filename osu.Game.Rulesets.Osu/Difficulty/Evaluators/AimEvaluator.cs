@@ -130,7 +130,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         public static double VelocityChangeBonus(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, OsuDifficultyHitObject prevprev)
         {
             const int diameter = OsuDifficultyHitObject.NORMALISED_DIAMETER;
-            double velocityChangeBonus;
 
             // We want to use the average velocity over the whole object when awarding differences, not the individual jump and slider path velocities.
             double prevVelocity = (prev.LazyJumpDistance + prevprev.TravelDistance) / prev.StrainTime;
@@ -142,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             // Reward for % distance up to 125 / strainTime for overlaps where velocity is still changing.
             double overlapVelocityBuff = Math.Min(diameter * 1.25 / Math.Min(curr.StrainTime, prev.StrainTime), Math.Abs(prevVelocity - currVelocity));
 
-            velocityChangeBonus = overlapVelocityBuff * distRatio;
+            double velocityChangeBonus = overlapVelocityBuff * distRatio;
 
             // Penalize for rhythm changes.
             velocityChangeBonus *= Math.Pow(Math.Min(curr.StrainTime, prev.StrainTime) / Math.Max(curr.StrainTime, prev.StrainTime), 2);
