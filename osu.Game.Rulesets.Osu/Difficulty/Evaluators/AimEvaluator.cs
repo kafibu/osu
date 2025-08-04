@@ -144,8 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double velocityChangeBonus = overlapVelocityBuff * distRatio;
 
             // Penalize for rhythm changes.
-            velocityChangeBonus *= Math.Pow(Math.Min(curr.StrainTime, prev.StrainTime) / Math.Max(curr.StrainTime, prev.StrainTime), 2);
-            return velocityChangeBonus;
+            return velocityChangeBonus *= Math.Pow(Math.Min(curr.StrainTime, prev.StrainTime) / Math.Max(curr.StrainTime, prev.StrainTime), 2);
         }
 
         public static double CalcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
