@@ -3,12 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -21,7 +23,7 @@ namespace osu.Game.Overlays
 {
     public partial class SettingsToolboxGroup : Container, IExpandable
     {
-        private readonly string title;
+        private readonly LocalisableString title;
         public const int CONTAINER_WIDTH = 270;
 
         private const float transition_duration = 250;
@@ -44,6 +46,12 @@ namespace osu.Game.Overlays
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
+        public Vector2 Spacing
+        {
+            get => content.Spacing;
+            set => content.Spacing = value;
+        }
+
         private OsuSpriteText headerText = null!;
 
         private Container headerContent = null!;
@@ -60,7 +68,7 @@ namespace osu.Game.Overlays
         /// Create a new instance.
         /// </summary>
         /// <param name="title">The title to be displayed in the header of this group.</param>
-        public SettingsToolboxGroup(string title)
+        public SettingsToolboxGroup(LocalisableString title)
         {
             this.title = title;
 
@@ -102,7 +110,7 @@ namespace osu.Game.Overlays
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = title.ToUpperInvariant(),
+                                    Text = title.ToUpper(),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
