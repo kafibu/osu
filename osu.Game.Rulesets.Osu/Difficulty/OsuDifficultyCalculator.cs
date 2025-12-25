@@ -95,6 +95,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = osuRatingCalculator.ComputeSpeedRating(speedDifficultyValue);
 
             double flashlightRating = 0.0;
+            double totalStrainCount = ((OsuStrainSkill)skills[0]).CountStrain();
 
             if (flashlight is not null)
                 flashlightRating = osuRatingCalculator.ComputeFlashlightRating(flashlight.DifficultyValue());
@@ -133,6 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
                 SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
                 DrainRate = drainRate,
+                TotalStrainCount = totalStrainCount,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,

@@ -84,6 +84,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("maximum_legacy_combo_score")]
         public double MaximumLegacyComboScore { get; set; }
 
+        [JsonProperty("total_strain_count")]
+        public double TotalStrainCount { get; set; }
+
         /// <summary>
         /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
         /// </summary>
@@ -127,6 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_NESTED_SCORE_PER_OBJECT, NestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
+            yield return (ATTRIB_ID_TOTAL_STRAIN_COUNT, TotalStrainCount);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -151,6 +155,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
+            TotalStrainCount = values[ATTRIB_ID_TOTAL_STRAIN_COUNT];
         }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
