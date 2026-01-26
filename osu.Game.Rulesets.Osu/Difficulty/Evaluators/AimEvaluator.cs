@@ -63,15 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
-                    acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
-
-                    // Penalize angle repetition.
-                    acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
-
-                    // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-                    acuteAngleBonus *= angleBonus *
-                                       DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
-                                       DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, diameter, diameter * 2);
+                    acuteAngleBonus = AcuteAngleBonus(currAngle, lastAngle, angleBonus, osuCurrObj);
                 }
 
                 wideAngleBonus = CalcWideAngleBonus(currAngle);
@@ -148,6 +140,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return velocity;
+        }
+
+        public static double AcuteAngleBonus(double currAngle, double lastAngle, double angleBonus, OsuDifficultyHitObject osuCurrObj)
+        {
+            double acuteAngleBonus = CalcAcuteAngleBonus(currAngle);
+
+            // Penalize angle repetition.
+            acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
+
+            // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
+            return acuteAngleBonus *= angleBonus *
+                                       DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+                                       DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 100, 200);
         }
 
         public static double VelocityChangeBonus(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, OsuDifficultyHitObject prevprev)
