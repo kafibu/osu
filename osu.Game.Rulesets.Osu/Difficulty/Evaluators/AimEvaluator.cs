@@ -151,8 +151,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
             return acuteAngleBonus * angleBonus *
-                                    DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
-                                    DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 100, 200);
+            DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+            DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 100, 200);
         }
 
         public static double VelocityChangeBonus(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, OsuDifficultyHitObject prevprev)
