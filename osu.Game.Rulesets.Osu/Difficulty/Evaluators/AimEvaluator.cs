@@ -144,10 +144,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             acuteAngleBonus *= 0.08 + 0.92 * (1 - Math.Min(acuteAngleBonus, Math.Pow(CalcAcuteAngleBonus(lastAngle), 3)));
 
             // Apply acute angle bonus for BPM above 300 1/2 and distance more than one diameter
-            return acuteAngleBonus * angleBonus *
-            DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
+            return acuteAngleBonus * angleBonus * DifficultyCalculationUtils.Smootherstep(DifficultyCalculationUtils.MillisecondsToBPM(osuCurrObj.AdjustedDeltaTime, 2), 300, 400) *
             DifficultyCalculationUtils.Smootherstep(osuCurrObj.LazyJumpDistance, 100, 200);
         }
+
         public static double WideAngleBonus(double currAngle, double lastAngle, double angleBonus, OsuDifficultyHitObject osuCurrObj)
         {
             double wideAngleBonus = CalcWideAngleBonus(currAngle);
