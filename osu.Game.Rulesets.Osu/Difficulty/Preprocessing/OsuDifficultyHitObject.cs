@@ -120,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Selective bonus for maps with higher circle size.
         /// </summary>
         public double SmallCircleBonus { get; private set; }
+        public double? NormalisedVectorAngle { get; private set; }
 
         private readonly OsuDifficultyHitObject? lastLastDifficultyObject;
         private readonly OsuDifficultyHitObject? lastDifficultyObject;
@@ -258,6 +259,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
                 double angle = calculateAngle(BaseObject.StackedPosition, lastCursorPosition, lastLastCursorPosition);
                 double sliderAngle = calculateSliderAngle(lastDifficultyObject!, lastLastCursorPosition);
+
+                Vector2 v = BaseObject.StackedPosition - lastCursorPosition;
+                NormalisedVectorAngle = Math.Atan2(Math.Abs(v.Y), Math.Abs(v.X));
 
                 Angle = Math.Min(angle, sliderAngle);
             }
