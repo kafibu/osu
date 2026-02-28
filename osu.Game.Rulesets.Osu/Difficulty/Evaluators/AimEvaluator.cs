@@ -70,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             double sliderBonus = 0;
             double velocityChangeBonus = 0;
             double wiggleBonus = 0;
+            double vectorRepetitionNerf = 1;
 
             double aimStrain = currVelocity; // Start strain with regular velocity.
 
@@ -80,6 +81,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
                 // Rewarding angles, take the smaller velocity as base.
                 double angleBonus = Math.Min(currVelocity, prevVelocity);
+
+                double baseNerf = calcWideAngleBonus(currAngle);
+
+                vectorRepetitionNerf = baseNerf + (1 - baseNerf) * angleVectorRepetition(osuCurrObj);
 
                 if (Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) < 1.25 * Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime)) // If rhythms are the same.
                 {
@@ -149,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 velocityChangeBonus *= Math.Pow(Math.Min(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime) / Math.Max(osuCurrObj.AdjustedDeltaTime, osuLastObj.AdjustedDeltaTime), 2);
             }
 
-            aimStrain *= angleVectorRepetition(osuCurrObj);
+            aimStrain *= vectorRepetitionNerf;      //angleVectorRepetition(osuCurrObj);
 
             if (osuCurrObj.BaseObject is Slider)
             {
@@ -209,8 +214,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                 index++;
             }
 
-            //return Math.Pow(Math.Min(1 / constantAngleCount, 1), 0.33);
-            return 0.7 + 0.3 * Math.Pow(DifficultyCalculationUtils.Smoothstep(constantAngleCount, 6, 0), 4);
+            //return Math.Pow(Math.Min(0.5 / constantAngleCount, 1), 0.143);
+            return 0.7 + 0.3 * Math.Pow(DifficultyCalculationUtils.Smoothstep(constantAngleCount, 6, 0), 2);
+            //return constantAngleCount;
         }
         private static double calcWideAngleBonus(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
 
