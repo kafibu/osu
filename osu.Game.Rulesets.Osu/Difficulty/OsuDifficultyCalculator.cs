@@ -138,7 +138,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpinnerCount = spinnerCount,
                 NestedScorePerObject = sliderNestedScorePerObject,
                 LegacyScoreBaseMultiplier = legacyScoreBaseMultiplier,
-                MaximumLegacyComboScore = scoreAttributes.ComboScore
+                MaximumLegacyComboScore = scoreAttributes.ComboScore,
+                AimDifficultyValue = aimDifficultyValue
             };
 
             return attributes;
