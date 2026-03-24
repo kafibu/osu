@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         // Therefore: f(x) + f(1/x) = 1
         // 0 <= f(x) <= 1 (cannot have negative or greater than 100% probability of snapping or flowing)
         // This logistic function is a solution, which fits nicely with the general idea of interpolation and provides a tuneable constant
-        private static double calculateSnapFlowProbability(double ratio)
+        public static double calculateSnapFlowProbability(double ratio)
         {
             const double k = 7.27;
 
