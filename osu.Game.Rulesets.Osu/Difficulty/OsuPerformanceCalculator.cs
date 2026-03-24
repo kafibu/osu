@@ -144,7 +144,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
-            deviation = calculateDeviation(countGreat, countOk, countMeh);
+            int amountHitObjectsWithAccuracy = osuAttributes.HitCircleCount;
+            if (!usingClassicSliderAccuracy || usingScoreV2)
+                amountHitObjectsWithAccuracy += osuAttributes.SliderCount;
+            int betterCountGreat = countGreat - (totalHits - amountHitObjectsWithAccuracy);
+            deviation = calculateDeviation(betterCountGreat, countOk, countMeh);
 
             double aimValue = computeAimValue(score, osuAttributes);
             double speedValue = computeSpeedValue(score, osuAttributes);
