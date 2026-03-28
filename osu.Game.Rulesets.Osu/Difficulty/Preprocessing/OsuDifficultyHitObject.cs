@@ -359,7 +359,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
         }
 
-        private Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
+        public Vector2 getEndCursorPosition(OsuDifficultyHitObject difficultyHitObject)
         {
             return difficultyHitObject.LazyEndPosition ?? difficultyHitObject.BaseObject.StackedPosition;
         }
