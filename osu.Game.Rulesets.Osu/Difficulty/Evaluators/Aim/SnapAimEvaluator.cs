@@ -43,14 +43,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currDistance = withSliderTravelDistance ? osuCurrObj.LazyJumpDistance : osuCurrObj.JumpDistance;
-            double currVelocity = currDistance / osuCurrObj.AdjustedDeltaTime;
-
-            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider && withSliderTravelDistance)
-            {
-                double sliderDistance = osuLastObj.LazyTravelDistance + osuCurrObj.LazyJumpDistance;
-                currVelocity = Math.Max(currVelocity, sliderDistance / osuCurrObj.AdjustedDeltaTime);
-            }
+            double currVelocity = VelocityEvaluator(osuCurrObj, osuLastObj, withSliderTravelDistance);
 
             double prevDistance = withSliderTravelDistance ? osuLastObj.LazyJumpDistance : osuLastObj.JumpDistance;
             double prevVelocity = prevDistance / osuLastObj.AdjustedDeltaTime;
@@ -211,6 +204,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Aim
             double baseNerf = 1 - maximum_repetition_nerf * CalcAngleAcuteness(lastAngle) * angleDifferenceAdjusted;
 
             return Math.Pow(baseNerf + (1 - baseNerf) * vectorRepetition * maximum_vector_influence * stackFactor, 2);
+        }
+
+        public static double VelocityEvaluator(OsuDifficultyHitObject curr, OsuDifficultyHitObject prev, bool withSliderTravelDistance)
+        {
+            double currDistance = withSliderTravelDistance ? curr.LazyJumpDistance : curr.JumpDistance;
+            double currVelocity = currDistance / curr.AdjustedDeltaTime;
+
+            // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
+            if (prev.BaseObject is Slider && withSliderTravelDistance)
+            {
+                double sliderDistance = prev.LazyTravelDistance + curr.LazyJumpDistance;
+                currVelocity = Math.Max(currVelocity, sliderDistance / curr.AdjustedDeltaTime);
+            }
+
+            return currVelocity;
         }
 
         private static double calcAngleWideness(double angle) => DifficultyCalculationUtils.Smoothstep(angle, double.DegreesToRadians(40), double.DegreesToRadians(140));
