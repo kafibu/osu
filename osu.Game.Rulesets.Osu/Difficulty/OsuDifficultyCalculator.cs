@@ -97,6 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double readingRating = osuRatingCalculator.ComputeReadingRating(readingDifficultyValue);
 
             double flashlightRating = 0.0;
+            double totalStrainCount = aim.CountStrain();
 
             if (flashlight is not null)
                 flashlightRating = osuRatingCalculator.ComputeFlashlightRating(flashlight.DifficultyValue());
@@ -133,6 +134,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ReadingDifficultNoteCount = readingDifficultNoteCount,
                 AimTopWeightedSliderFactor = aimTopWeightedSliderFactor,
                 SpeedTopWeightedSliderFactor = speedTopWeightedSliderFactor,
+                TotalStrainCount = totalStrainCount,
+                AimDifficultyValue = aimDifficultyValue,
                 MaxCombo = beatmap.GetMaxCombo(),
                 HitCircleCount = hitCircleCount,
                 SliderCount = sliderCount,

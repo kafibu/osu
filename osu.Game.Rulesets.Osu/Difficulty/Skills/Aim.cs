@@ -243,5 +243,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return strains.OrderByDescending(p => p.Value);
         }
+
+        public double CountStrain() => ObjectDifficulties.Count;
     }
 }

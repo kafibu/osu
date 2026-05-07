@@ -93,6 +93,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("maximum_legacy_combo_score")]
         public double MaximumLegacyComboScore { get; set; }
 
+        [JsonProperty("total_strain_count")]
+        public double TotalStrainCount { get; set; }
+
+        [JsonProperty("aim_difficulty_value")]
+        public double AimDifficultyValue { get; set; }
+
+
+
         /// <summary>
         /// The number of hitcircles in the beatmap.
         /// </summary>
@@ -133,6 +141,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
             yield return (ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT, ReadingDifficultNoteCount);
+            yield return (ATTRIB_ID_TOTAL_STRAIN_COUNT, TotalStrainCount);
+            yield return (ATTRIB_ID_AIM_DIFFICULTY_VALUE, AimDifficultyValue);
         }
 
         public override void FromDatabaseAttributes(IReadOnlyDictionary<int, double> values, IBeatmapOnlineInfo onlineInfo)
@@ -158,6 +168,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
+            TotalStrainCount = values[ATTRIB_ID_TOTAL_STRAIN_COUNT];
+            AimDifficultyValue = values[ATTRIB_ID_AIM_DIFFICULTY_VALUE];
         }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
