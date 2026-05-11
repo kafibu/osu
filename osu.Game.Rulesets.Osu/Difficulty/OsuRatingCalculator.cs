@@ -20,16 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public double ComputeAimRating(double aimDifficultyValue)
         {
-            if (mods.Any(m => m is OsuModAutopilot))
-                return 0;
-
             double aimRating = Math.Pow(aimDifficultyValue, 0.7) * 0.0168;
-
-            if (mods.Any(m => m is OsuModMagnetised))
-            {
-                float magnetisedStrength = mods.OfType<OsuModMagnetised>().First().AttractionStrength.Value;
-                aimRating *= 1.0 - magnetisedStrength;
-            }
 
             double ratingMultiplier = 1.0;
 
