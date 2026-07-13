@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators.Speed
             for (int i = rhythmStart; i > 0; i--)
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)current.Previous(i - 1);
+
                 if (currObj.BaseObject is Spinner)
                     continue;
 
