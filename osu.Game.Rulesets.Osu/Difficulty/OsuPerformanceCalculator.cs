@@ -541,17 +541,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return traceableBonus;
         }
 
-        // Miss penalty assumes that a player will miss on the hardest parts of a map,
-        // so we use the amount of relatively difficult sections to adjust miss penalty
-        // to make it more punishing on maps with lower amount of hard sections.
-        private double calculateMissPenalty(double missCount, double difficultStrainCount) => 0.93 / (missCount / (4 * Math.Log(Math.Max(1, difficultStrainCount))) + 1);
-        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(DiffUtils.Pow(scoreMaxCombo, 0.8) / DiffUtils.Pow(attributes.MaxCombo, 0.8), 1.0);
+        // Due to the unavailability of miss location in PP, the following formulas assume that a player will miss on the hardest parts of a map.
 
-        private double calculateRateAdjustedApproachRate(double approachRate, double clockRate)
-        {
-            double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN) / clockRate;
-            return IBeatmapDifficultyInfo.InverseDifficultyRange(preempt, OsuHitObject.PREEMPT_MAX, OsuHitObject.PREEMPT_MID, OsuHitObject.PREEMPT_MIN);
-        }
+        // With the curve fitted miss penalty, we use a pre-computed curve of skill levels for each miss count, raised to the power of 1.5 as
+        // the multiple of the exponents on star rating and PP. This power should be changed if either SR or PP begin to use a different exponent.
+        private double calculatePolynomialMissPenalty(double missCount, double[] coefficients) => Math.Pow(1 - PolynomialPenaltyUtils.GetPenaltyAt(coefficients, Math.Log(missCount + 1)), 2.1);
+
+        // With the strain count miss penalty, we use the amount of relatively difficult sections to adjust the miss penalty,
+        // to make it more punishing on maps with lower amount of hard sections. This formula is subject to balance.
+        private double calculateStrainCountMissPenalty(double missCount, double difficultStrainCount) => 0.93 / (missCount / (4 * Math.Log(difficultStrainCount)) + 1);
+
+        private double getComboScalingFactor(OsuDifficultyAttributes attributes) => attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(attributes.MaxCombo, 0.8), 1.0);
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
