@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : HarmonicSkill
     {
+        public readonly bool WithRhythm;
         private readonly List<double> sliderStrains = new List<double>();
 
         private double currentStrain;
@@ -27,9 +28,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double HarmonicScale => 20;
         protected override double DecayExponent => 0.9;
 
-        public Speed(Mod[] mods)
+        public Speed(Mod[] mods, bool withRhythm)
             : base(mods)
         {
+            this.WithRhythm = withRhythm;
         }
 
         private double strainDecay(double ms) => DiffUtils.Pow(0.3, ms / 1000);
@@ -46,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             currentStrain *= decay;
             currentStrain += calculateAdjustedDifficulty(current) * (1 - decay) * skill_multiplier;
 
-            double currentRhythm = RhythmEvaluator.EvaluateDifficultyOf(current);
+            double currentRhythm = WithRhythm ? RhythmEvaluator.EvaluateDifficultyOf(current) : 1;
 
             double totalStrain = currentStrain * currentRhythm;
 

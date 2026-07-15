@@ -35,13 +35,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             var aim = skills.OfType<Aim>().Single(a => a.IncludeSliders);
             var aimWithoutSliders = skills.OfType<Aim>().Single(a => !a.IncludeSliders);
-            var speed = skills.OfType<Speed>().Single();
+            var speed = skills.OfType<Speed>().Single(a => a.WithRhythm);
+            var speedWithoutRhythm = skills.OfType<Speed>().Single(a => !a.WithRhythm);
             var flashlight = skills.OfType<Flashlight>().SingleOrDefault();
             var reading = skills.OfType<Reading>().Single();
 
             double aimDifficultyValue = aim.DifficultyValue();
+            Console.WriteLine(aimDifficultyValue);
             double aimNoSlidersDifficultyValue = aimWithoutSliders.DifficultyValue();
             double speedDifficultyValue = speed.DifficultyValue();
+            double speedNoRhythmDifficultyValue = speedWithoutRhythm.DifficultyValue();
             double readingDifficultyValue = reading.DifficultyValue();
 
             double aimDifficultStrainCount = aim.CountTopWeightedStrains(aimDifficultyValue);
@@ -69,6 +72,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sliderFactor = aimDifficultyValue > 0
                 ? calculateAimDifficultyRating(aimNoSlidersDifficultyValue) / calculateAimDifficultyRating(aimDifficultyValue)
                 : 1;
+
+            double rhythmFactor = speedDifficultyValue > 0
+                ? calculateDifficultyRating(speedNoRhythmDifficultyValue) / calculateDifficultyRating(speedDifficultyValue)
+                : 1;
+
 
             double aimRating = calculateAimDifficultyRating(aimDifficultyValue);
             double speedRating = calculateDifficultyRating(speedDifficultyValue);
@@ -106,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 FlashlightDifficulty = flashlightRating,
                 ReadingDifficulty = readingRating,
                 SliderFactor = sliderFactor,
+                RhythmFactor = rhythmFactor,
                 AimDifficultStrainCount = aimDifficultStrainCount,
                 SpeedDifficultStrainCount = speedDifficultStrainCount,
                 ReadingDifficultNoteCount = readingDifficultNoteCount,
@@ -166,7 +175,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
-                new Speed(mods),
+                new Speed(mods, true),
+                new Speed(mods, false),
                 new Reading(mods)
             };
 

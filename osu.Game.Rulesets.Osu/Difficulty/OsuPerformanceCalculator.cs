@@ -305,7 +305,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 ? Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.3)
                 : Math.Pow(amountHitObjectsWithAccuracy / 1000.0, 0.1);*/
 
-            double accuracyValue = 120 * Math.Pow(7.5 / (double)deviation, 2);
+            double accuracyValue = 120 * Math.Pow(7.5 / (double)deviation, 2) * DiffUtils.Smootherstep(attributes.RhythmFactor, 1.2, 0.8);
 
             // Increasing the accuracy value by object count for Blinds isn't ideal, so the minimum buff is given.
             if (score.Mods.Any(m => m is OsuModBlinds))
