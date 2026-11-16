@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
@@ -42,8 +39,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         /// <summary>
         /// The difficulty corresponding to the flashlight skill.
         /// </summary>
-        [JsonProperty("flashlight_difficulty")]
-        public double FlashlightDifficulty { get; set; }
+        [JsonProperty("flashlight_difficulty", NullValueHandling = NullValueHandling.Ignore)]
+        public double? FlashlightDifficulty { get; set; }
+
+        /// <summary>
+        /// The difficulty corresponding to the reading skill.
+        /// </summary>
+        [JsonProperty("reading_difficulty")]
+        public double ReadingDifficulty { get; set; }
 
         /// <summary>
         /// Describes how much of <see cref="AimDifficulty"/> is contributed to by hitcircles or sliders.
@@ -75,6 +78,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("speed_difficult_strain_count")]
         public double SpeedDifficultStrainCount { get; set; }
 
+        [JsonProperty("reading_difficult_note_count")]
+        public double ReadingDifficultNoteCount { get; set; }
+
         [JsonProperty("nested_score_per_object")]
         public double NestedScorePerObject { get; set; }
 
@@ -86,11 +92,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         [JsonProperty("total_strain_count")]
         public double TotalStrainCount { get; set; }
-
-        /// <summary>
-        /// The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
-        /// </summary>
-        public double DrainRate { get; set; }
 
         /// <summary>
         /// The number of hitcircles in the beatmap.
@@ -114,9 +115,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             yield return (ATTRIB_ID_AIM, AimDifficulty);
             yield return (ATTRIB_ID_SPEED, SpeedDifficulty);
+            yield return (ATTRIB_ID_READING, ReadingDifficulty);
             yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
-            if (ShouldSerializeFlashlightDifficulty())
+            if (FlashlightDifficulty != null)
                 yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
@@ -130,6 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return (ATTRIB_ID_NESTED_SCORE_PER_OBJECT, NestedScorePerObject);
             yield return (ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER, LegacyScoreBaseMultiplier);
             yield return (ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE, MaximumLegacyComboScore);
+            yield return (ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT, ReadingDifficultNoteCount);
             yield return (ATTRIB_ID_TOTAL_STRAIN_COUNT, TotalStrainCount);
         }
 
@@ -139,8 +142,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             AimDifficulty = values[ATTRIB_ID_AIM];
             SpeedDifficulty = values[ATTRIB_ID_SPEED];
+            ReadingDifficulty = values[ATTRIB_ID_READING];
             StarRating = values[ATTRIB_ID_DIFFICULTY];
-            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
+
+            if (values.TryGetValue(ATTRIB_ID_FLASHLIGHT, out double flashlightDifficulty))
+                FlashlightDifficulty = flashlightDifficulty;
+
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
             AimDifficultStrainCount = values[ATTRIB_ID_AIM_DIFFICULT_STRAIN_COUNT];
             SpeedDifficultStrainCount = values[ATTRIB_ID_SPEED_DIFFICULT_STRAIN_COUNT];
@@ -151,22 +158,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             NestedScorePerObject = values[ATTRIB_ID_NESTED_SCORE_PER_OBJECT];
             LegacyScoreBaseMultiplier = values[ATTRIB_ID_LEGACY_SCORE_BASE_MULTIPLIER];
             MaximumLegacyComboScore = values[ATTRIB_ID_MAXIMUM_LEGACY_COMBO_SCORE];
-            DrainRate = onlineInfo.DrainRate;
+            ReadingDifficultNoteCount = values[ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT];
             HitCircleCount = onlineInfo.CircleCount;
             SliderCount = onlineInfo.SliderCount;
             SpinnerCount = onlineInfo.SpinnerCount;
             TotalStrainCount = values[ATTRIB_ID_TOTAL_STRAIN_COUNT];
         }
-
-        #region Newtonsoft.Json implicit ShouldSerialize() methods
-
-        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
-        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
-        // unless the fields are also renamed.
-
-        [UsedImplicitly]
-        public bool ShouldSerializeFlashlightDifficulty() => Mods.Any(m => m is ModFlashlight);
-
-        #endregion
     }
 }

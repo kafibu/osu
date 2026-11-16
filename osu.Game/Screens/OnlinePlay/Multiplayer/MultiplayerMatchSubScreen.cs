@@ -30,6 +30,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -164,7 +165,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Title = room.RoomID == null ? "New room" : room.Name;
             Activity.Value = new UserActivity.InLobby(room);
 
-            Padding = new MarginPadding { Top = Header.HEIGHT };
+            Padding = new MarginPadding
+            {
+                Top = Header.HEIGHT,
+                Horizontal = HORIZONTAL_OVERFLOW_PADDING
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -187,7 +192,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Horizontal = WaveOverlayContainer.WIDTH_PADDING,
+                                Horizontal = 30,
                                 Bottom = footer_height + footer_padding
                             },
                             Children = new[]
@@ -206,7 +211,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         {
                                             new MultiplayerRoomPanel(room)
                                             {
-                                                OnEdit = () => settingsOverlay.Show()
+                                                OnEdit = () => settingsOverlay.Show(),
+                                                ShowDescription = true,
                                             }
                                         },
                                         null,
@@ -400,6 +406,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
                             Height = footer_height,
+                            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING },
                             Children = new Drawable[]
                             {
                                 new Box
@@ -421,7 +428,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             LoadComponent(userModsSelectOverlay = new MultiplayerUserModSelectOverlay
             {
-                Beatmap = { BindTarget = Beatmap }
+                Beatmap = { BindTarget = Beatmap },
+                Ruleset = { BindTarget = Ruleset },
             });
         }
 
@@ -596,7 +604,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 default:
-                    targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
+                    if (!client.IsReferee)
+                        targetScreen.Push(new MultiplayerPlayerLoader(() => new MultiplayerPlayer(room, new PlaylistItem(client.Room.CurrentPlaylistItem), users)));
                     break;
             }
         }
@@ -606,7 +615,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (ev)
             {
                 case RollEvent rollEvent:
-                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? new APIUser { Username = "Unknown user" };
+                    var user = client.Room?.Users.SingleOrDefault(u => u.UserID == rollEvent.UserID)?.User ?? APIUser.UnknownUser(rollEvent.UserID);
                     string text = $"{user.Username} rolled {"point".ToQuantity(rollEvent.Result)} out of {rollEvent.Max}.";
                     chat.Channel.Value?.AddNewMessages(new InfoMessage(text));
                     break;
@@ -676,8 +685,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Ruleset.Value = ruleset;
             Mods.Value = client.LocalUser.Mods.Concat(item.RequiredMods).Select(m => m.ToMod(rulesetInstance)).ToArray();
 
-            bool freemods = item.Freestyle || item.AllowedMods.Any();
-            bool freestyle = item.Freestyle;
+            bool freemods = !client.IsReferee && (item.Freestyle || item.AllowedMods.Any());
+            bool freestyle = !client.IsReferee && item.Freestyle;
 
             if (freemods)
                 userModsSection.Show();
@@ -921,8 +930,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room.CanAddPlaylistItems(client.LocalUser) != true)
                 return;
 
-            // If there's only one playlist item and we are the host, assume we want to change it. Else add a new one.
-            PlaylistItem? itemToEdit = client.IsHost && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
+            // If there's only one playlist item and we are the host / a referee, assume we want to change it. Else add a new one.
+            PlaylistItem? itemToEdit = (client.IsHost || client.IsReferee) && room.Playlist.Count == 1 ? room.Playlist.Single() : null;
 
             ShowSongSelect(itemToEdit);
 
@@ -954,6 +963,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.UserStyleChanged -= onUserStyleChanged;
                 client.UserModsChanged -= onUserModsChanged;
                 client.LoadRequested -= onLoadRequested;
+                client.MatchEvent -= onMatchEvent;
             }
         }
 

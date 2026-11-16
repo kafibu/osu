@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable disable
-
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -11,18 +9,17 @@ using osu.Framework.Audio;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
@@ -35,18 +32,17 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public partial class TestSceneDeleteLocalScore : OsuManualInputManagerTestScene
     {
-        private readonly ContextMenuContainer contextMenuContainer;
         private readonly BeatmapLeaderboardWedge leaderboard;
 
         private RulesetStore rulesets = null!;
-        private BeatmapManager beatmapManager;
-        private ScoreManager scoreManager;
+        private BeatmapManager beatmapManager = null!;
+        private ScoreManager scoreManager = null!;
 
         private readonly List<ScoreInfo> importedScores = new List<ScoreInfo>();
 
-        private BeatmapInfo beatmapInfo;
+        private BeatmapInfo beatmapInfo = null!;
 
-        private LeaderboardManager leaderboardManager { get; set; }
+        private LeaderboardManager leaderboardManager { get; set; } = null!;
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Aquamarine);
@@ -60,15 +56,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Children = new Drawable[]
             {
-                contextMenuContainer = new OsuContextMenuContainer
+                leaderboard = new BeatmapLeaderboardWedge
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = leaderboard = new BeatmapLeaderboardWedge
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Size = new Vector2(0.6f),
-                    }
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Size = new Vector2(0.6f),
                 },
                 dialogOverlay = new DialogOverlay()
             };
@@ -140,12 +132,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
             AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().Any());
+            AddUntilStep("wait for loaded", () => leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().All(s => s.IsLoaded));
         }
 
         [Test]
         public void TestDeleteViaRightClick()
         {
-            ScoreInfo scoreBeingDeleted = null;
+            ScoreInfo scoreBeingDeleted = null!;
             AddStep("open menu for top score", () =>
             {
                 var leaderboardScore = leaderboard.ChildrenOfType<BeatmapLeaderboardScore>().First();
@@ -157,12 +150,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             // Ensure the context menu has finished showing
-            AddStep("finish transforms", () => contextMenuContainer.FinishTransforms(true));
+            AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
 
             AddStep("click delete option", () =>
             {
-                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>()
-                                                             .First(i => string.Equals(i.Item.Text.Value.ToString(), "delete", System.StringComparison.OrdinalIgnoreCase)));
+                InputManager.MoveMouseTo(leaderboard.ChildrenOfType<DrawableOsuMenuItem>()
+                                                    .First(i => i.Item.Text.Value == CommonStrings.ButtonsDelete));
                 InputManager.Click(MouseButton.Left);
             });
 
